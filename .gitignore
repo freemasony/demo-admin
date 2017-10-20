@@ -1,0 +1,19 @@
+target/
+/.settings
+/.project
+/.classpath
+/.DS_Store
+/1
+/derby.log
+/.externalToolBuilders
+
+# IntelliJ Idea
+.idea/
+out/
+*.ipr
+*.iws
+*.iml
+/bin
+*.bak
+
+test/

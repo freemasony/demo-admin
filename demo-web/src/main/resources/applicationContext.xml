@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+       http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
+
+    <description>Spring公共配置</description>
+
+    <import resource="mybatis-config.xml"/>
+
+    <!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+    <context:component-scan base-package="com.demo.data,com.demo.business,com.demo.web.controller">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+
+
+    <!-- 使用annotation定义事务 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- JSR303 Validator定义 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <!-- SPRING mvc 的date类型转换 -->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.demo.common.converter.StringToTimestampConverter"></bean>
+            </list>
+        </property>
+    </bean>
+
+    <util:properties id="config" location="classpath:upload.properties"/>
+
+
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+
+    <!-- 集群缓存-->
+   <!-- <bean id="jedisUtil" class="com.demo.common.util.JedisUtil" init-method="getInstance" scope="singleton" lazy-init="false">
+        <property name="config" ref="jedisConfig"/>
+        <property name="mutli" value="${redis.mutli}"/>
+    </bean>-->
+
+    <!-- 集群缓存配置-->
+    <!--<bean id="jedisConfig" class="redis.clients.jedis.JedisPoolConfig" scope="singleton">
+        <property name="maxWaitMillis" value="${redis.pool.maxWait}"/>
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <property name="minIdle" value="${redis.pool.minIdle}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${redis.pool.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${redis.pool.minEvictableIdleTimeMillis}"/>
+        <property name="numTestsPerEvictionRun" value="${redis.poll.numTestsPerEvictionRun}"/>
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <property name="testOnReturn" value="${redis.pool.testOnReturn}"/>
+        <property name="testWhileIdle" value="${redis.poll.testWhileIdle}"/>
+    </bean>-->
+
+
+    <beans profile="dev">
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/dev/jdbc.properties"/>
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/dev/http_internal_api_ip.properties"/>
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/dev/redismutli.properties"/>
+        <util:properties id="applicationConfig" location="classpath:/dev/application.properties"/>
+    </beans>
+
+    <beans profile="prod">
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/prod/jdbc.properties"/>
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/prod/http_internal_api_ip.properties"/>
+        <context:property-placeholder ignore-unresolvable="true"
+                                      location="classpath*:/prod/redismutli.properties"/>
+        <util:properties id="applicationConfig" location="classpath:/prod/application.properties"/>
+    </beans>
+</beans>
